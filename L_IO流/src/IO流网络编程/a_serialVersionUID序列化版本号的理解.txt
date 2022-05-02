@@ -1,0 +1,18 @@
+序列化是Java中实现持久化存储的一种方法；为数据传输提供了线路级对象表示法。
+Java的序列化机制是通过在运行时判断类的serialVersionUID来验证版本一致性的。
+在进行反序列化时，JVM会把传来的字节流中的serialVersionUID与本地相应实体（类）
+的serialVersionUID进行比较，如果相同就认为是一致的，可以进行反序列化，否则就会出现序列化版本不一致的异常。
+
+比如：
+1、首先创建了一个Person类，它并没有添加序列化版本号
+2、使用对象流把一个Person类写入到了一个文件test.dat中
+3、但是在反序列化之前，在Person类里添加了一个属性和构造方法
+4、此时再进行反序列化就会报错！java.io.InvalidClassException  (无效类异常)
+因为再序列化之前，没有给该类确定的版本号来标识（serialVersionUID）。
+因此，在类发生变化的时候，Java无法找到原来的类。
+
+如果在创建类的时候给予其版本号，那么即使该类在反序列化之前就发生了变化，Java也能找到该类，并把原数据跟着变化。
+比如Person声明了版本号，并且在序列化之后 添加了属性 id，那么在反序列化的时候，该属性也能加入反序列化后的对象。
+1、序列化之前：Person(String name,int age)     把对象 person(name:"aa", age:100)写入文件
+2、序列化存入文件后更改此类为：Person(String name,int age)
+3、反序列化后 输出对象person为：person(name:"aa", age:100, id:0)     对象跟着类的变化而变化！
